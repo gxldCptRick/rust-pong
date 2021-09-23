@@ -1,4 +1,4 @@
 (
     title: "Pong!",
-    dimensions: Some((900, 600)),
+    dimensions: Some((600, 500)),
 )

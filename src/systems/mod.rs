@@ -9,7 +9,9 @@ use amethyst::input::{InputHandler, StringBindings};
 use crate::pong::{Paddle, Side, ARENA_HEIGHT, PADDLE_HEIGHT};
 pub use self::move_balls::*;
 pub use self::bounce::*;
+pub use self::winner::*;
 
+mod winner;
 mod move_balls;
 mod bounce;
 
