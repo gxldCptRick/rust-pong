@@ -1,11 +1,15 @@
 mod pong;
+
+
 use amethyst::core::TransformBundle;
+use amethyst::input::{InputBundle, StringBindings};
 use amethyst::utils::application_root_dir;
 use amethyst::renderer::{RenderFlat2D, RenderToWindow, RenderingBundle, types::DefaultBackend};
 use amethyst::GameDataBuilder;
 use amethyst::Application;
 
 use crate::pong::Pong;
+mod systems; // Import the module
 
 fn main() -> Result<(), amethyst::Error> {
     amethyst::start_logger(Default::default());
@@ -20,12 +24,24 @@ fn main() -> Result<(), amethyst::Error> {
     )
     // RenderFlat2D plugin is used to render entities with a `SpriteRender` component.
     .with_plugin(RenderFlat2D::default());
+    let binding_path = app_root.join("config").join("bindings.ron");
+
+    let input_bundle = InputBundle::<StringBindings>::new()
+    .with_bindings_from_file(binding_path)?;
     let game_data = GameDataBuilder::default()
         .with_bundle(
             bundle,
-        )?;
-    let game_data = game_data.with_bundle(TransformBundle::new())?;
-    let mut game = Application::new(assets_dir, Pong, game_data)?;
+        )?
+        .with_bundle(TransformBundle::new())?
+        .with_bundle(input_bundle)?
+        .with(systems::PaddleSystem, "paddle_system", &["input_system"])
+        .with(systems::MoveBallsSystem, "ball_system", &[])
+        .with(
+            systems::BounceSystem,
+            "collision_system",
+            &["paddle_system", "ball_system"],
+        );
+    let mut game = Application::new(assets_dir, Pong::default(), game_data)?;
     game.run();
     Ok(())
 }
